@@ -1,90 +1,105 @@
 import React from 'react';
-import { 
-    SafeAreaView,
-    View,
-    Text,
-    Image,
-    StyleSheet,
-    ScrollView
-} from 'react-native';
+import { ScrollView } from 'react-native';
+import styled from 'styled-components';
 
 export default class About extends React.Component {
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      contact: {}
-    }
+  state = {
+    contact: {}
   }
 
-  componentWillMount() {
-    console.disableYellowBox = true;
-    this.setState({ contact: this.props.navigation.getParam('contact') })
+  get contact() {
+    return this.props.navigation.getParam('contact');
   }
 
   render() {
-    // const image = this.state.contact.picture.large;
-    const { street, city, state, country, postcode } = this.state.contact.location;
+    const { street, city, state, country, postcode } = this.contact.location;
     const address = `${street.name}, ${street.number} - ${city}, ${state}, ${country} - ${postcode}`;
-
+    
     return(
-      <SafeAreaView style={styles.container}>
-        <View style={styles.header}>
-          <Text style={styles.title}>Dados do Contato</Text>
-        </View>
+      <Container>
+        <Header>
+          <Title>Dados do Contato</Title>
+        </Header>
 
         <ScrollView>
-          <Image 
-            style={{ width: 415, height: 415 }}
-            source={{uri: this.state.contact.picture.large}}
-            resizeMode='cover'
-          />
+          <ProfilePicture source={{uri: this.contact.picture.large}} resizeMode='cover' />
 
-          <View style={styles.contactMainInfo}>
-            <Text style={{ fontSize: 20, fontWeight: '500' }}>{this.state.contact.name}</Text>
-            <Text style={{ fontSize: 18, color: '#787878' }}>{this.state.contact.phone}</Text>
-            {/* <Icon name="home" size={18} color="#999" /> */}
-          </View>
+          <MainInfoContainer>
+            <Name>{this.contact.name}</Name>
+            <PhoneNumber>{this.contact.phone}</PhoneNumber>
+          </MainInfoContainer>
 
-          <View style={{ padding: 10 }}>
-            <Text style={{ fontSize: 26, fontWeight: '400' }}>Anotações</Text>
+          <NotesContainer>
+            <Subtitle>Anotações</Subtitle>
 
-            <View style={{ marginTop: 10 }}>
-              <Text style={{ fontSize: 18 }}>Username: {this.state.contact.username}</Text>
-              <Text style={{ fontSize: 18 }}>Email: {this.state.contact.email}</Text>
-              <Text style={{ fontSize: 18 }}>Idade: {this.state.contact.age}</Text>  
-              <Text style={{ fontSize: 18 }}>Gender: {this.state.contact.gender}</Text>
-              <Text style={{ fontSize: 18 }}>Endereço: {address}</Text>
-            </View>
-          </View>
+            <InfosContainer>
+              <Info>Username: {this.contact.username}</Info>
+              <Info>Email: {this.contact.email}</Info>
+              <Info>Idade: {this.contact.age}</Info>  
+              <Info>Gender: {this.contact.gender}</Info>
+              <Info>Endereço: {address}</Info>
+            </InfosContainer>
+          </NotesContainer>
         </ScrollView>
-      </SafeAreaView>
+      </Container>
     )
   }
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1
-  },
-  header:{
-    flexDirection: 'row',
-    paddingHorizontal: 10,
-    paddingVertical: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderBottomColor: '#c5c5c5',
-    borderBottomWidth: 1,
+const Container = styled.SafeAreaView`
+  flex: 1;
+`;
 
-  },
-  title: {
-    fontSize: 38,
-    fontWeight: '600',
-  },
-  contactMainInfo: { 
-    borderColor: '#c5c5c5',
-    borderTopWidth: 1,
-    borderBottomWidth: 1,
-    padding: 10 
-  }
-})
+const Header = styled.View`
+  flex-direction: row;
+  padding-top: 10;
+  padding-bottom: 10;
+  align-items: center;
+  justify-content: center;
+  border-bottom-width: 1;
+  border-color: #c5c5c5;
+`;
+
+const Title = styled.Text`
+  font-size: 38px;
+  font-weight: 600;
+`;
+
+const Subtitle = styled.Text`
+  font-size: 26px;
+  font-weight: 400;
+`;
+
+const ProfilePicture = styled.Image`
+  width: 415px;
+  height: 415px;
+`;
+
+const MainInfoContainer = styled.View`
+  border-color:#c5c5c5;
+  border-top-width: 1px;
+  border-bottom-width: 1px;
+  padding: 10px;
+`;
+
+const Name = styled.Text`
+  font-size: 20px;
+  font-weight: 500;
+`;
+
+const PhoneNumber = styled.Text`
+  font-size: 18px;
+  color: #787878;
+`;
+
+const NotesContainer = styled.View`
+  padding: 10px;
+`;
+
+const InfosContainer = styled.View`
+  margin-top: 10px;
+`;
+
+const Info = styled.Text`
+  font-size: 18px;
+`;

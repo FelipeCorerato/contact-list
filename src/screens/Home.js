@@ -1,39 +1,24 @@
 import React  from 'react';
-import { 
-    SafeAreaView,
-    View,
-    FlatList,
-    Text,
-    StyleSheet,
-    TouchableOpacity,
-    Button,
-    Image
-} from 'react-native';
+import { FlatList, Button } from 'react-native';
+import styled from 'styled-components';
 
+// services
 import api from '../services/api';
 
+// components
+import Contact from '../components/Contact';
+
 export default class Home extends React.Component {
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      contacts: [],
-      refreshing: false
-    };
-  }
-
-  contactPress = info => {
-    this.props.navigation.navigate('About', info)
-  }
-
+  state = {
+    contacts: [],
+  };
+  
   getContacts = async () => {
-    this.setState({ contact: [] })
-
     for (var i = 1; i <= 10; i++) {
       const a = await api.get();
-      const results = a.data.results[0]
+      const results = a.data.results[0];
       const contact = {
-        id: results.uuid,
+        id: results.login.uuid,
         name: `${results.name.first} ${results.name.last}`,
         email: results.email,
         username: results.login.username,
@@ -48,78 +33,99 @@ export default class Home extends React.Component {
     }
   }
 
-  componentWillMount() {
-    console.disableYellowBox = true;
+  componentDidMount() {
     this.getContacts();
   }
 
+  handleContactClick = contact => this.props.navigation.navigate('About', { contact });
+
+  renderItem = ({ item }) => <Contact data={item} navigation={this.props.navigation} />;
+
   render() {
     return (
-      <SafeAreaView style={styles.container}>
-        <View style={styles.header}>
-          <Text style={styles.title}>Contatos</Text>
-          <Button title='Add more' onPress={this.getContacts}  />
-        </View>
+      <Container>
+        <Header>
+          <Title>Contatos</Title>
+          <Button title='Add more' onPress={this.getContacts} />
+        </Header>
 
         <FlatList 
           data={this.state.contacts}
           keyExtractor={item => item.id}
-          renderItem={({ item }) => (
-            <TouchableOpacity 
-              key={item.id}
-              style={styles.contactContainer}
-              onPress={() => this.props.navigation.navigate('About', {contact: item})}
-            >
-              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <Image 
-                  style={styles.profilePicture}
-                  source={{uri: item.picture.thumbnail}} 
-                />
-
-                <View>
-                  <Text style={{ fontSize: 20 }}>{item.name}</Text>
-                  <Text style={{ color: '#636363' }}>{item.phone}</Text>
-                </View>
-              </View>
-  
-              <Text style={{ fontSize: 30, alignSelf: 'center' }}> > </Text>
-            </TouchableOpacity>
-          )}
-          refreshing={this.state.refreshing}
-          onRefresh={this.handleRefresh}
+          renderItem={this.renderItem}
         />
-      </SafeAreaView>
+      </Container>
     );
   }
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  header:{
-    flexDirection: 'row',
-    paddingTop: 5,
-    paddingHorizontal: 10,
-    marginBottom: 10,
-    alignItems: 'center',
-    justifyContent: 'space-between'
-  },
-  title: {
-    fontSize: 40,
-    fontWeight: '600',
-  },
-  contactContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginHorizontal: 10,
-    borderBottomWidth: 1,
-    borderColor: '#c5c5c5'
-  },
-  profilePicture: {
-    width: 70, 
-    height: 70, 
-    margin: 5,
-    borderRadius: 50
-  },
-});
+
+
+/*
+withProps(({ item: { image }}) => ({
+  image: { uri: image },
+}))
+handlePress = () => this.props.onPress(this.props.item);
+ContacContainer onPress={this.handlePress}
+*/
+
+const Container = styled.SafeAreaView`
+	flex: 1;
+`;
+
+const Header = styled.View`
+  flex-direction: row;
+
+  padding-top: 10px;
+  padding-bottom: 10px;
+  padding-left: 15px;
+  padding-right: 15px;
+
+  align-items: center;
+  justify-content: space-between;
+
+  border-bottom-width: 1px;
+  border-color: #c5c5c5;
+`;
+
+const Title = styled.Text`
+	font-size: 40px;
+	font-weight: 600;
+`;
+
+const ContactContainer = styled.TouchableOpacity`
+  flex-direction: row;
+  justify-content: space-between;
+
+  margin-left: 10px;
+  margin-right: 10px;
+
+  border-bottom-width: 1px;
+  border-color: #c5c5c5;
+`;
+
+const ContactData = styled.View`
+  flex-direction: row;
+  align-items: center;
+`;
+
+const Arrow = styled.Text`
+  font-size: 30px;
+  align-self: center;
+`;
+
+const ContactPicture = styled.Image`
+  width: 70px; 
+  height: 70px; 
+
+  margin: 5px;
+  border-radius: 50px;
+`;
+
+const ContactName = styled.Text`
+  font-size: 20px;
+`;
+
+const ContactNumber = styled.Text`
+  color: #636363;
+`;
